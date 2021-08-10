@@ -14,8 +14,7 @@
 
     <PackageThirdPartyNoticesFile>$(MSBuildThisFileDirectory)THIRD-PARTY-NOTICES.TXT</PackageThirdPartyNoticesFile>
     <Nullable>disable</Nullable>
-
-    <ResolveStaticWebAssetsInputsDependsOn>$(ResolveStaticWebAssetsInputsDependsOn);_UpdateIdentityAssets</ResolveStaticWebAssetsInputsDependsOn>
+    <GetBuildAssetsTargets>_UpdateIdentityAssets;GetCurrentProjectBuildStaticWebAssetItems</GetBuildAssetsTargets>
   </PropertyGroup>
 
   <ItemGroup>
@@ -42,6 +41,7 @@
     </ItemGroup>
   </Target>
 
+  <!-- This is only needed for tests and the tests will always look for V5 -->
   <Target Name="_UpdateIdentityAssets">
     <ItemGroup>
       <_IdentityUIAssets Include="@(StaticWebAsset)" Condition="'%(SourceId)' == 'Microsoft.AspNetCore.Identity.UI'">
