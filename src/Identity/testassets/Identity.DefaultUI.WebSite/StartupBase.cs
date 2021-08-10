@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -105,32 +104,16 @@ namespace Identity.DefaultUI.WebSite
                     case IFileProvider staticWebAssets when staticWebAssets.GetType().Name == "StaticWebAssetsFileProvider":
                         GetUnderlyingProvider(staticWebAssets).UseActivePolling = false;
                         break;
-                    case IFileProvider manifestStaticWebAssets when manifestStaticWebAssets.GetType().Name == "ManifestStaticWebAssetFileProvider":
-                        foreach (var provider in GetUnderlyingProviders(manifestStaticWebAssets))
-                        {
-                            pendingProviders.Push(provider);
-                        }
-                        break;
                     case CompositeFileProvider composite:
                         foreach (var childFileProvider in composite.FileProviders)
                         {
                             pendingProviders.Push(childFileProvider);
                         }
                         break;
-                    case NullFileProvider:
-                        break;
                     default:
-                        throw new InvalidOperationException($"Unknown provider '{currentProvider.GetType().Name}'");
+                        throw new InvalidOperationException("Unknown provider");
                 }
             }
-        }
-
-        private static IFileProvider[] GetUnderlyingProviders(IFileProvider manifestStaticWebAssets)
-        {
-            return (IFileProvider[])manifestStaticWebAssets
-                .GetType()
-                .GetField("_fileProviders", BindingFlags.NonPublic | BindingFlags.Instance)
-                .GetValue(manifestStaticWebAssets);
         }
 
         private static PhysicalFileProvider GetUnderlyingProvider(IFileProvider staticWebAssets)

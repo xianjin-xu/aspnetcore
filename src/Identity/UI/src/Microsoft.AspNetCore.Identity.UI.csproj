@@ -8,14 +8,22 @@
     <PackageTags>aspnetcore;identity;membership;razorpages</PackageTags>
     <EnableDefaultRazorGenerateItems>false</EnableDefaultRazorGenerateItems>
     <AddRazorSupportForMvc>true</AddRazorSupportForMvc>
-    <StaticWebAssetBasePath>Identity</StaticWebAssetBasePath>
+
+    <DisableStaticWebAssetsBuildPropsFileGeneration>true</DisableStaticWebAssetsBuildPropsFileGeneration>
+    <StaticWebAssetsDisableProjectBuildPropsFileGeneration>true</StaticWebAssetsDisableProjectBuildPropsFileGeneration>
+
     <PackageThirdPartyNoticesFile>$(MSBuildThisFileDirectory)THIRD-PARTY-NOTICES.TXT</PackageThirdPartyNoticesFile>
     <Nullable>disable</Nullable>
+
+    <ResolveStaticWebAssetsInputsDependsOn>$(ResolveStaticWebAssetsInputsDependsOn);_UpdateIdentityAssets</ResolveStaticWebAssetsInputsDependsOn>
   </PropertyGroup>
 
   <ItemGroup>
     <Content Remove="@(Content)" />
     <Content Include="wwwroot\**\*" Pack="true" />
+    <None Include="build\*" Pack="true" PackagePath="build\" />
+    <None Include="buildMultiTargeting\*" Pack="true" PackagePath="buildMultiTargeting\" />
+    <None Include="buildTransitive\*" Pack="true" PackagePath="buildTransitive\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -33,5 +41,16 @@
       <RazorGenerate Include="@(_RazorGenerate)" Link="Areas\Identity\Pages\%(RecursiveDir)%(Filename)%(Extension)" />
     </ItemGroup>
   </Target>
+
+  <Target Name="_UpdateIdentityAssets">
+    <ItemGroup>
+      <_IdentityUIAssets Include="@(StaticWebAsset)" Condition="'%(SourceId)' == 'Microsoft.AspNetCore.Identity.UI'">
+        <ContentRoot>%(StaticWebAsset.ContentRoot)V5\</ContentRoot>
+        <RelativePath>$([System.String]::Copy('%(StaticWebAsset.RelativePath)').Replace('V5/',''))</RelativePath>
+      </_IdentityUIAssets>
+      <StaticWebAsset Remove="@(_IdentityUIAssets)" />
+      <StaticWebAsset Include="@(_IdentityUIAssets)" />
+    </ItemGroup>
+    </Target>
 
 </Project>
